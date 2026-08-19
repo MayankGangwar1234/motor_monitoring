@@ -1,0 +1,24 @@
+{
+  "name": "motor-monitoring-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "MQTT ingestion, FFT processing and rule-based motor health API",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test",
+    "simulate": "node src/simulator.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "mongodb": "^6.18.0",
+    "mqtt": "^5.13.3",
+    "socket.io": "^4.8.1"
+  }
+}
+

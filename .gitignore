@@ -1,0 +1,11 @@
+.env
+**/.env
+**/node_modules/
+**/dist/
+**/__pycache__/
+**/.pytest_cache/
+firmware/include/config.h
+.pio/
+*.log
+.DS_Store
+

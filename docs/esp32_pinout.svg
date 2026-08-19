@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760" role="img" aria-labelledby="title desc">
+  <title id="title">ESP32 motor monitoring fully labelled pin diagram</title>
+  <desc id="desc">Connections from an ESP32 DevKit V1 to MPU6050, OLED, DS18B20, PZEM-004T, RPM sensor, isolated relay, buzzer and status LED.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07111f"/><stop offset="1" stop-color="#10243a"/></linearGradient>
+    <linearGradient id="board" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#245e73"/><stop offset="1" stop-color="#153b4f"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <style>
+      text{font-family:Inter,Arial,sans-serif;fill:#eaf3fd}.sub{fill:#88a0b8;font-size:16px}.pin{fill:#dcecff;font:600 17px monospace}.label{font-size:18px;font-weight:600}.wire{fill:none;stroke-width:3}.box{fill:#0d1d2d;stroke:#2d4b64;stroke-width:2}.note{fill:#ffc56b;font-size:15px}
+    </style>
+  </defs>
+  <rect width="1280" height="760" rx="18" fill="url(#bg)"/>
+  <text x="52" y="56" font-size="30" font-weight="700">ESP32 DevKit V1 · Motor G23 wiring</text>
+  <text x="52" y="84" class="sub">All low-voltage grounds share GND. Motor mains stays isolated behind the PZEM and rated contactor.</text>
+
+  <rect x="480" y="118" width="320" height="580" rx="28" fill="url(#board)" stroke="#4f93a8" stroke-width="3"/>
+  <rect x="565" y="145" width="150" height="102" rx="8" fill="#101c29" stroke="#7890a4"/>
+  <path d="M580 175h120M580 190h120M580 205h120" stroke="#a9bac8" opacity=".55"/>
+  <text x="640" y="287" text-anchor="middle" font-size="25" font-weight="700">ESP32-WROOM-32</text>
+  <text x="640" y="315" text-anchor="middle" class="sub">Dual-core acquisition + Wi-Fi/MQTT</text>
+
+  <g><circle cx="492" cy="370" r="7" fill="#32d6c5"/><text x="510" y="377" class="pin">GPIO 21 · SDA</text></g>
+  <g><circle cx="492" cy="410" r="7" fill="#32d6c5"/><text x="510" y="417" class="pin">GPIO 22 · SCL</text></g>
+  <g><circle cx="492" cy="470" r="7" fill="#ffb454"/><text x="510" y="477" class="pin">GPIO 4 · 1-Wire</text></g>
+  <g><circle cx="492" cy="530" r="7" fill="#7c8cff"/><text x="510" y="537" class="pin">GPIO 16 · RX2</text></g>
+  <g><circle cx="492" cy="570" r="7" fill="#7c8cff"/><text x="510" y="577" class="pin">GPIO 17 · TX2</text></g>
+  <g><circle cx="788" cy="370" r="7" fill="#5ab0ff"/><text x="770" y="377" text-anchor="end" class="pin">GPIO 27 · RPM</text></g>
+  <g><circle cx="788" cy="430" r="7" fill="#ff5e70"/><text x="770" y="437" text-anchor="end" class="pin">GPIO 26 · RELAY</text></g>
+  <g><circle cx="788" cy="490" r="7" fill="#dd75ff"/><text x="770" y="497" text-anchor="end" class="pin">GPIO 25 · BUZZER</text></g>
+  <g><circle cx="788" cy="550" r="7" fill="#47d5b3"/><text x="770" y="557" text-anchor="end" class="pin">GPIO 2 · LED</text></g>
+  <g><circle cx="565" cy="686" r="7" fill="#ef5b5b"/><text x="575" y="664" class="pin">3V3</text><circle cx="715" cy="686" r="7" fill="#8595a6"/><text x="677" y="664" class="pin">GND</text></g>
+
+  <rect class="box" x="52" y="130" width="310" height="112" rx="10"/><text x="75" y="165" class="label">MPU6050 + 0.96″ OLED</text><text x="75" y="194" class="sub">SDA → 21 · SCL → 22</text><text x="75" y="220" class="sub">3V3 · GND · addresses 0x68 / 0x3C</text>
+  <path class="wire" stroke="#32d6c5" d="M362 185H420V370H492M420 410H492"/>
+
+  <rect class="box" x="52" y="294" width="310" height="112" rx="10"/><text x="75" y="329" class="label">DS18B20 temperature</text><text x="75" y="358" class="sub">DATA → GPIO 4 · VDD → 3V3</text><text x="75" y="384" class="note">4.7 kΩ pull-up: DATA to 3V3</text>
+  <path class="wire" stroke="#ffb454" d="M362 350H445V470H492"/>
+
+  <rect class="box" x="52" y="458" width="310" height="132" rx="10"/><text x="75" y="493" class="label">PZEM-004T v3 TTL side</text><text x="75" y="522" class="sub">PZEM TX → GPIO 16 (ESP RX2)</text><text x="75" y="548" class="sub">PZEM RX → GPIO 17 (ESP TX2)</text><text x="75" y="574" class="note">Isolated mains wiring: qualified lab only</text>
+  <path class="wire" stroke="#7c8cff" d="M362 515H450V530H492M450 565V570H492"/>
+
+  <rect class="box" x="918" y="130" width="310" height="112" rx="10"/><text x="942" y="165" class="label">Hall / IR RPM sensor</text><text x="942" y="194" class="sub">Digital OUT → GPIO 27</text><text x="942" y="220" class="note">Use 3.3 V output or level shifter</text>
+  <path class="wire" stroke="#5ab0ff" d="M788 370H860V186H918"/>
+
+  <rect class="box" x="918" y="294" width="310" height="132" rx="10"/><text x="942" y="329" class="label">Isolated relay / driver</text><text x="942" y="358" class="sub">IN → GPIO 26 · active LOW</text><text x="942" y="384" class="sub">Driver → rated contactor coil</text><text x="942" y="410" class="note">Never switch motor mains with hobby relay</text>
+  <path class="wire" stroke="#ff5e70" filter="url(#glow)" d="M788 430H858V360H918"/>
+
+  <rect class="box" x="918" y="478" width="310" height="112" rx="10"/><text x="942" y="513" class="label">Local indicators</text><text x="942" y="542" class="sub">Active buzzer → GPIO 25</text><text x="942" y="568" class="sub">Status LED → GPIO 2</text>
+  <path class="wire" stroke="#dd75ff" d="M788 490H878V526H918"/><path class="wire" stroke="#47d5b3" d="M788 550H884V558H918"/>
+
+  <text x="52" y="720" class="note">⚠ This is a prototype monitoring connection diagram, not a certified safety circuit. Emergency stop must remain independent.</text>
+</svg>
+
