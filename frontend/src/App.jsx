@@ -96,7 +96,7 @@ export default function App() {
     labels: history.map((item) => time(item.timestamp)),
     datasets: [
       { label: "Current A", data: history.map((item) => item.currentA), borderColor: "#7c8cff", tension: 0.25, pointRadius: 0 },
-      { label: "Power ÷ 100 W", data: history.map((item) => (item.powerW || 0) / 100), borderColor: "#dd75ff", tension: 0.25, pointRadius: 0 }
+      { label: "Power W", data: history.map((item) => item.powerW || 0), borderColor: "#dd75ff", tension: 0.25, pointRadius: 0 }
     ]
   }), [history]);
 
@@ -105,8 +105,14 @@ export default function App() {
     datasets: [{ label: "Amplitude g", data: (spectrum?.spectrum || []).map((bin) => bin.amplitudeG), backgroundColor: "rgba(50,214,197,.62)", borderRadius: 2 }]
   }), [spectrum]);
 
+  const commandPrompt = {
+    START: "Start the 12 V motor? Firmware will reject START if a trip is latched or a required sensor is unsafe.",
+    STOP: "Send a protected STOP and latch the motor OFF?",
+    RESET: "Clear the trip latch? The motor remains OFF until a separate START command."
+  };
+
   const sendCommand = async (command) => {
-    if (!window.confirm(command === "STOP" ? "Send a protected STOP request to Motor G23?" : "Request relay reset? Reset is accepted by firmware only when local readings are safe.")) return;
+    if (!window.confirm(commandPrompt[command])) return;
     setCommandState("Sending…");
     try {
       await fetchJson("/api/motor/command", {
@@ -120,13 +126,14 @@ export default function App() {
   const status = latest?.status || "UNKNOWN";
   const reasons = latest?.reasons || [];
   const online = Boolean(latest?.online && socketConnected);
+  const motorState = latest?.tripLatched ? "TRIPPED" : latest?.motorEnabled ? "ON" : "READY";
 
   return (
     <main className="shell">
       <header className="topbar">
         <div>
-          <div className="eyebrow">MNNIT · GROUP 23 · LIVE ASSET</div>
-          <h1>Induction Motor <span>Condition Monitor</span></h1>
+          <div className="eyebrow">MNNIT · GROUP 23 · 12 V MODEL</div>
+          <h1>DC Motor <span>Condition Monitor</span></h1>
         </div>
         <div className="topbar__state">
           <span className={`connection ${online ? "connection--online" : ""}`}><i />{online ? "LIVE" : "OFFLINE"}</span>
@@ -138,16 +145,17 @@ export default function App() {
       {!history.length && !apiError && <div className="notice">Waiting for Motor G23 telemetry. Run <code>npm run simulate</code> inside <code>backend/</code> to preview all states.</div>}
 
       <section className="metrics">
-        <MetricCard label="Winding temperature" value={number(latest?.temperatureC)} unit="°C" accent="#ffb454" detail={`Updated ${time(latest?.timestamp)}`} />
-        <MetricCard label="Motor current" value={number(latest?.currentA, 2)} unit="A" accent="#7c8cff" detail={`${number(latest?.powerW, 0)} W active estimate`} />
-        <MetricCard label="Supply voltage" value={number(latest?.voltageV, 1)} unit="V" accent="#dd75ff" detail="PZEM-004T measurement" />
+        <MetricCard label="Casing temperature" value={number(latest?.temperatureC)} unit="°C" accent="#ffb454" detail={`Updated ${time(latest?.timestamp)}`} />
+        <MetricCard label="Motor current" value={number(latest?.currentA, 2)} unit="A" accent="#7c8cff" detail={`${number(latest?.powerW, 2)} W measured`} />
+        <MetricCard label="DC bus voltage" value={number(latest?.voltageV, 2)} unit="V" accent="#dd75ff" detail="INA219 high-side measurement" />
         <MetricCard label="Shaft speed" value={number(latest?.rpm, 0)} unit="RPM" accent="#5ab0ff" detail={`${number(spectrum?.shaftHz, 1)} Hz shaft frequency`} />
         <MetricCard label="Vibration RMS" value={number(latest?.vibration?.rmsG, 3)} unit="g" accent="#32d6c5" detail={`Peak ${number(latest?.vibration?.peakG, 3)} g`} />
+        <MetricCard label="Motor output" value={motorState} unit="" accent={latest?.tripLatched ? "#ff5e70" : "#47d5b3"} detail={latest?.tripLatched ? latest?.tripReason : "FR120N on GPIO23"} />
       </section>
 
       <section className="grid grid--charts">
         <article className="panel panel--wide"><div className="chart"><Line data={trendData} options={chartOptions("Thermal & vibration trend", "°C / RMS × 100")} /></div></article>
-        <article className="panel"><div className="chart"><Line data={electricalData} options={chartOptions("Electrical load trend", "A / 100 W")} /></div></article>
+        <article className="panel"><div className="chart"><Line data={electricalData} options={chartOptions("12 V electrical trend", "A / W")} /></div></article>
         <article className="panel"><div className="chart"><Bar data={spectrumData} options={chartOptions(`FFT spectrum · dominant ${number(spectrum?.dominantHz, 1)} Hz`, "Amplitude g")} /></div></article>
       </section>
 
@@ -159,7 +167,12 @@ export default function App() {
               <div className="reason" key={reason.code}><span>{reason.code.replaceAll("_", " ")}</span><strong>{number(reason.value, 2)}</strong><em>{reason.status}</em></div>
             )) : <div className="healthy"><span>✓</span><div><strong>No active fault reasons</strong><p>All configured measurements are inside their calibrated limits.</p></div></div>}
           </div>
-          <div className="controls"><button className="button button--danger" onClick={() => sendCommand("STOP")}>Protected stop</button><button className="button" onClick={() => sendCommand("RESET")}>Reset request</button><span>{commandState}</span></div>
+          <div className="controls">
+            <button className="button" onClick={() => sendCommand("START")}>Start motor</button>
+            <button className="button button--danger" onClick={() => sendCommand("STOP")}>Protected stop</button>
+            <button className="button" onClick={() => sendCommand("RESET")}>Reset trip</button>
+            <span>{commandState}</span>
+          </div>
         </article>
 
         <article className="panel alerts">
@@ -176,4 +189,3 @@ export default function App() {
     </main>
   );
 }
-

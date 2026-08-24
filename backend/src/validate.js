@@ -9,13 +9,19 @@ export function validateTelemetry(input) {
   if (!isoDate(input.timestamp)) errors.push("timestamp must be ISO-8601");
   if (!Number.isInteger(input.sequence) || input.sequence < 0) errors.push("sequence must be a non-negative integer");
   const ranges = {
-    temperatureC: [-55, 150],
-    currentA: [0, 200],
-    voltageV: [0, 600],
-    rpm: [0, 100000]
+    temperatureC: [-55, 125],
+    currentA: [0, 5],
+    voltageV: [0, 26],
+    rpm: [0, 5000]
   };
   for (const [field, [min, max]] of Object.entries(ranges)) {
     if (!finite(input[field]) || input[field] < min || input[field] > max) errors.push(`${field} out of range`);
+  }
+  for (const field of ["motorEnabled", "tripLatched"]) {
+    if (input[field] !== undefined && typeof input[field] !== "boolean") errors.push(`${field} must be boolean`);
+  }
+  if (input.powerW !== undefined && (!finite(input.powerW) || input.powerW < 0 || input.powerW > 130)) {
+    errors.push("powerW out of range");
   }
   return errors;
 }
@@ -33,4 +39,3 @@ export function validateVibrationBlock(input) {
   }
   return errors;
 }
-

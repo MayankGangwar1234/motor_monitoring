@@ -24,16 +24,15 @@ export const config = {
   }
 };
 
-// Demonstration defaults only. Calibrate these values against the motor
-// nameplate, healthy recordings and lab-supervisor limits before protection use.
+// Demonstration defaults for the selected 12 V, 300 RPM N20 motor. Replace
+// them with measured healthy baselines after the hardware is assembled.
 export const defaultThresholds = {
-  temperatureC: { warning: 60, abnormal: 75, critical: 90 },
-  currentA: { warning: 3.0, abnormal: 4.0, critical: 5.0 },
-  vibrationRmsG: { warning: 0.18, abnormal: 0.35, critical: 0.7 },
-  rpmDeviationPercent: { warning: 5, abnormal: 10, critical: 20 },
+  temperatureC: { warning: 45, abnormal: 52, critical: 60 },
+  currentA: { warning: 0.45, abnormal: 0.80, critical: 1.20 },
+  vibrationRmsG: { warning: 0.10, abnormal: 0.25, critical: 0.45 },
+  rpmDeviationPercent: { warning: 10, abnormal: 20, critical: 40 },
   persistenceWindows: 3,
   recoveryWindows: 5,
   hysteresisPercent: 8,
-  nominalRpm: number("NOMINAL_RPM", 1440)
+  nominalRpm: number("NOMINAL_RPM", 300)
 };
-

@@ -78,6 +78,7 @@ async function processTelemetry(payload) {
         twoXEnergy: features.twoXEnergy
       }
     : { rmsG: payload.vibrationRmsG ?? null };
+  const calculatedPowerW = Number((payload.voltageV * payload.currentA).toFixed(2));
   const record = {
     timestamp: new Date(payload.timestamp),
     meta: {
@@ -88,14 +89,16 @@ async function processTelemetry(payload) {
     temperatureC: payload.temperatureC,
     currentA: payload.currentA,
     voltageV: payload.voltageV,
-    powerW: Number((payload.voltageV * payload.currentA).toFixed(2)),
+    powerW: Number.isFinite(payload.powerW) ? payload.powerW : calculatedPowerW,
     rpm: payload.rpm,
     vibration,
     status: assessment.status,
     rawStatus: assessment.rawStatus,
     reasons: assessment.reasons,
     rpmDeviationPercent: assessment.rpmDeviationPercent,
-    relayTripped: Boolean(payload.relayTripped),
+    motorEnabled: Boolean(payload.motorEnabled),
+    tripLatched: Boolean(payload.tripLatched),
+    tripReason: typeof payload.tripReason === "string" ? payload.tripReason : "none",
     receivedAt: new Date()
   };
   await store.insertTelemetry(record);
@@ -119,7 +122,10 @@ async function processTelemetry(payload) {
       deviceId: payload.deviceId,
       timestamp: new Date().toISOString(),
       status: assessment.status,
-      reasons: assessment.reasons
+      reasons: assessment.reasons,
+      motorEnabled: record.motorEnabled,
+      tripLatched: record.tripLatched,
+      tripReason: record.tripReason
     }), { qos: 1, retain: true });
   }
   return output;
@@ -195,6 +201,9 @@ app.get("/api/motor/status", async (request, response, next) => {
       online: availability.get(deviceId) !== "offline",
       status: latest?.status || "UNKNOWN",
       reasons: latest?.reasons || [],
+      motorEnabled: latest?.motorEnabled || false,
+      tripLatched: latest?.tripLatched || false,
+      tripReason: latest?.tripReason || "none",
       timestamp: latest?.timestamp || null
     });
   } catch (error) { next(error); }
@@ -208,7 +217,9 @@ app.get("/api/config/thresholds", (_request, response) => response.json(defaultT
 
 app.post("/api/motor/command", (request, response) => {
   const command = String(request.body?.command || "").toUpperCase();
-  if (!["STOP", "RESET"].includes(command)) return response.status(400).json({ error: "command must be STOP or RESET" });
+  if (!["START", "STOP", "RESET"].includes(command)) {
+    return response.status(400).json({ error: "command must be START, STOP or RESET" });
+  }
   if (!mqttClient.connected) return response.status(503).json({ error: "MQTT broker is not connected" });
   const message = JSON.stringify({ command, requestedAt: new Date().toISOString(), source: "dashboard" });
   mqttClient.publish(config.topics.command, message, { qos: 1 }, (error) => {

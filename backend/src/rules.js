@@ -23,7 +23,8 @@ export class RuleEngine {
       ? 1
       : 1 - this.thresholds.hysteresisPercent / 100;
     const nominalRpm = telemetry.nominalRpm || this.thresholds.nominalRpm;
-    const rpmDeviationPercent = nominalRpm > 0 && Number.isFinite(telemetry.rpm)
+    const motorRunning = telemetry.motorEnabled !== false;
+    const rpmDeviationPercent = motorRunning && nominalRpm > 0 && Number.isFinite(telemetry.rpm)
       ? (Math.abs(telemetry.rpm - nominalRpm) / nominalRpm) * 100
       : 0;
     const checks = [

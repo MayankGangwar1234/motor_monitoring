@@ -4,54 +4,58 @@
 
 ```mermaid
 flowchart TD
-    A["Induction motor"] --> B["Temperature · vibration · electrical · RPM sensors"]
-    B --> C["ESP32 acquisition and local critical check"]
+    A["N20 12 V DC motor"] --> B["Temperature · vibration · DC electrical · RPM sensors"]
+    B --> C["ESP32 acquisition and local trip logic"]
     C -->|"Wi-Fi · MQTT"| D["Mosquitto broker"]
-    D --> E["Node.js ingestion and validation"]
+    D --> E["Node.js ingestion and low-voltage validation"]
     E --> F["Hann window · FFT · time-domain features"]
     F --> G["Persistent rule engine"]
     G --> H["MongoDB time series"]
     G --> I["Socket.IO + REST API"]
     I --> J["React live dashboard"]
-    G -->|"Critical alert"| K["ESP32 command channel"]
-    K --> L["Isolated driver · rated contactor"]
+    G -->|"START / STOP / RESET"| K["ESP32 command channel"]
+    K --> L["FR120N MOSFET motor switch"]
 ```
 
-The backend deliberately separates raw vibration blocks from slow telemetry. A 256-sample block at 512 Hz gives one spectrum every 0.5 seconds and an FFT-bin spacing of 2 Hz. Temperature, current, voltage and RPM are published every two seconds. This keeps MQTT overhead reasonable without losing vibration timing information.
+The ESP32 publishes a 256-sample vibration block at 256 Hz once per second and slow telemetry every two seconds. A one-second block gives 1 Hz FFT-bin spacing, suitable for the approximately 5 Hz shaft frequency of the selected 300 RPM motor.
+
+## Hardware domains
+
+- **12 V motor branch:** adapter positive -> E-stop NC -> 2 A fuse -> INA219 VIN+ / VIN- -> motor/FR120N branch.
+- **5 V electronics branch:** adapter -> LM2596 adjusted to 5.0 V -> ESP32 VIN/5V.
+- **3.3 V logic:** ESP32 3V3 powers compatible sensor logic. GPIO inputs must not exceed 3.3 V.
+- **Common ground:** motor-switch return, buck return, ESP32 and sensor grounds meet at a low-resistance common node.
+
+The 1N5408 flyback diode is directly across the motor, striped end to motor positive. The hardware is used for ON/OFF control, not high-frequency speed control.
 
 ## Sampling and DSP
 
-The ESP32 samples the magnitude of acceleration after gravity removal in a dedicated FreeRTOS task. The backend rejects non-finite or non-power-of-two blocks, removes their mean, computes RMS, standard deviation, peak, peak-to-peak and crest factor, applies a Hann window, and performs a radix-2 FFT.
-
-For FFT bin `k`, sample rate `fs`, and block size `N`:
+The ESP32 samples acceleration magnitude after gravity removal in a dedicated FreeRTOS task. The backend rejects non-finite or non-power-of-two blocks, removes their mean, computes RMS, standard deviation, peak, peak-to-peak and crest factor, applies a Hann window and performs a radix-2 FFT.
 
 ```text
-frequency(k) = k × fs / N
-resolution   = fs / N
+frequency(k) = k x sample_rate / block_size
+resolution   = sample_rate / block_size
 shaft Hz     = RPM / 60
 ```
 
-The live backend reports the dominant non-DC peak plus energy around the 1× and 2× shaft regions. `python-dsp/` is an independent NumPy/SciPy reference implementation that also calculates a Welch PSD. Its synthetic-sine test prevents sensor behavior from being confused with FFT software correctness.
+The backend reports the dominant non-DC peak and energy near the 1x and 2x shaft regions. `python-dsp/` provides an independent NumPy/SciPy reference and Welch PSD.
 
-## Rule engine
+## Rule engine and motor state
 
-Thresholds live in `backend/src/config.js`; they are demonstration defaults, not universal vibration limits. The engine evaluates temperature, current, vibration RMS, and RPM deviation separately, retains reason codes, and chooses the worst state. Warning and abnormal increases require three consecutive windows, recovery requires five healthy windows, and critical conditions act immediately.
+The rule engine separately evaluates temperature, current, vibration RMS and RPM deviation. Warning and abnormal increases require persistence; critical conditions act immediately. Thresholds in `backend/src/config.js` are demonstration starting values for the selected N20 motor and must be tuned from healthy measurements.
 
-Calibration procedure:
+Firmware maintains two independent state fields:
 
-1. Record the motor nameplate, intended load, sensor position, and pulses per revolution.
-2. Collect multiple healthy recordings without moving the accelerometer.
-3. Calculate healthy medians, spread, and high percentiles by operating condition.
-4. Agree motor-specific safety limits with the laboratory supervisor.
-5. Replay predefined values for all four states before any relay test.
-6. Test protection first with a dry/low-risk load, then only through a properly rated contactor.
+- `motorEnabled`: the GPIO23 command currently applied to the FR120N input.
+- `tripLatched`: a protected stop occurred and RESET is required before another START.
+
+On boot, GPIO23 is driven LOW before sensors or networking are initialized. START is rejected when a required sensor is missing, STOP is open, a threshold is unsafe or a trip remains latched. RESET clears a safe latch but leaves the motor OFF. The latching E-stop and fuse remain independent of firmware.
 
 ## Reliability boundaries
 
-- MQTT telemetry uses QoS 0; status, commands, alerts, and availability use QoS 1.
-- ESP32 Last Will marks the device offline after an abnormal disconnect.
-- Malformed MQTT payloads are logged and rejected without crashing the process.
-- MongoDB uses a 90-day time-series collection. Development falls back to bounded in-memory storage unless `REQUIRE_MONGO=true`.
-- Relay reset is rejected by the ESP32 while a local critical reading remains.
-- Local trip thresholds are compiled but disabled until `ENABLE_LOCAL_PROTECTION=1` is deliberately set after calibration.
-
+- Telemetry and raw vibration use MQTT QoS 0; status, commands, alerts and availability use QoS 1.
+- Last Will marks the ESP32 offline after an abnormal disconnect.
+- Malformed MQTT payloads are rejected without stopping the process.
+- MongoDB stores 90 days of time-series data; development can use bounded memory fallback.
+- Local protection is enabled for the demonstration model but limits must be calibrated after assembly.
+- Physical START/STOP handling is compile-time optional; the motor cannot restart automatically after a trip or power recovery.

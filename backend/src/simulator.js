@@ -1,6 +1,6 @@
 const baseUrl = process.env.API_URL || "http://localhost:3000";
 const deviceId = process.env.DEVICE_ID || "motor-G23";
-const sampleRateHz = 512;
+const sampleRateHz = 256;
 const sampleCount = 256;
 let sequence = 0;
 
@@ -16,10 +16,10 @@ const post = async (path, body) => {
 
 function operatingPoint(elapsedSeconds) {
   const phase = Math.floor(elapsedSeconds / 25) % 4;
-  if (phase === 1) return { temperatureC: 64, currentA: 3.2, rpm: 1390, amplitude: 0.23, label: "WARNING" };
-  if (phase === 2) return { temperatureC: 78, currentA: 4.2, rpm: 1270, amplitude: 0.42, label: "ABNORMAL" };
-  if (phase === 3) return { temperatureC: 93, currentA: 5.4, rpm: 1080, amplitude: 0.8, label: "CRITICAL" };
-  return { temperatureC: 45, currentA: 2.1, rpm: 1440, amplitude: 0.08, label: "NORMAL" };
+  if (phase === 1) return { temperatureC: 46, currentA: 0.48, rpm: 270, amplitude: 0.12, label: "WARNING" };
+  if (phase === 2) return { temperatureC: 54, currentA: 0.85, rpm: 225, amplitude: 0.28, label: "ABNORMAL" };
+  if (phase === 3) return { temperatureC: 62, currentA: 1.25, rpm: 150, amplitude: 0.52, label: "CRITICAL" };
+  return { temperatureC: 34, currentA: 0.18, rpm: 300, amplitude: 0.03, label: "NORMAL" };
 }
 
 async function tick(startedAt) {
@@ -37,21 +37,23 @@ async function tick(startedAt) {
   await post("/api/dev/vibration", { deviceId, timestamp, sequence, sampleRateHz, rpm: point.rpm, samples });
   const result = await post("/api/dev/telemetry", {
     deviceId,
-    experimentId: "software-simulation",
+    experimentId: "dc-12v-software-simulation",
     timestamp,
     sequence,
     temperatureC: point.temperatureC + (Math.random() - 0.5),
-    currentA: point.currentA + (Math.random() - 0.5) * 0.04,
-    voltageV: 230 + (Math.random() - 0.5) * 2,
-    rpm: point.rpm + Math.round((Math.random() - 0.5) * 8),
-    relayTripped: point.label === "CRITICAL"
+    currentA: point.currentA + (Math.random() - 0.5) * 0.02,
+    voltageV: 12 + (Math.random() - 0.5) * 0.16,
+    powerW: 12 * point.currentA,
+    rpm: point.rpm + Math.round((Math.random() - 0.5) * 4),
+    motorEnabled: point.label !== "CRITICAL",
+    tripLatched: point.label === "CRITICAL",
+    tripReason: point.label === "CRITICAL" ? "simulated local trip" : "none"
   });
   console.log(`${timestamp} simulated=${point.label} classified=${result.status} rpm=${result.rpm}`);
   sequence += 1;
 }
 
-console.log(`Publishing simulated motor data to ${baseUrl}. Press Ctrl+C to stop.`);
+console.log(`Publishing simulated 12 V DC motor data to ${baseUrl}. Press Ctrl+C to stop.`);
 const startedAt = Date.now();
 await tick(startedAt);
 setInterval(() => tick(startedAt).catch((error) => console.error(error.message)), 2000);
-
