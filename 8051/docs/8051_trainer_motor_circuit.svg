@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1100" viewBox="0 0 1600 1100">
+  <defs>
+    <style>
+      .title{font:700 36px Arial;fill:#10233f}.h{font:700 23px Arial;fill:#10233f}.t{font:18px Arial;fill:#172033}.s{font:15px Arial;fill:#36445f}.box{fill:#f8fbff;stroke:#315b8a;stroke-width:3}.power{fill:#fff6e5;stroke:#b56b00;stroke-width:3}.safe{fill:#eef9ef;stroke:#2b7a3d;stroke-width:3}.warn{fill:#fff0f0;stroke:#a62d2d;stroke-width:3}.wire{fill:none;stroke:#243247;stroke-width:4}.pwire{fill:none;stroke:#c5392f;stroke-width:5}.gwire{fill:none;stroke:#111;stroke-width:5}.sig{fill:none;stroke:#235fa4;stroke-width:4}.dash{fill:none;stroke:#66758b;stroke-width:3;stroke-dasharray:10 8}.dot{fill:#243247}.note{fill:#f1f4f8;stroke:#7a879a;stroke-width:2}
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#243247"/></marker>
+    <marker id="bluearrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#235fa4"/></marker>
+  </defs>
+
+  <rect width="1600" height="1100" fill="white"/>
+  <text x="800" y="58" text-anchor="middle" class="title">8051 Trainer Kit - 12 V DC Motor Control and RPM Experiment</text>
+  <text x="800" y="88" text-anchor="middle" class="s">AT89S52/AT89C52 compatible | 5 V logic | 12 V motor branch | all grounds common</text>
+
+  <rect x="55" y="135" width="360" height="780" rx="18" class="box"/>
+  <text x="235" y="180" text-anchor="middle" class="h">8051 TRAINER KIT</text>
+  <text x="235" y="210" text-anchor="middle" class="s">Regulated +5 V, 11.0592 MHz</text>
+
+  <text x="85" y="270" class="t">P1.0  MOTOR</text><circle cx="390" cy="263" r="6" class="dot"/>
+  <text x="85" y="320" class="t">P1.1  BUZZER</text><circle cx="390" cy="313" r="6" class="dot"/>
+  <text x="85" y="370" class="t">P1.2  GREEN LED</text><circle cx="390" cy="363" r="6" class="dot"/>
+  <text x="85" y="420" class="t">P1.3  YELLOW LED</text><circle cx="390" cy="413" r="6" class="dot"/>
+  <text x="85" y="470" class="t">P1.4  RED LED</text><circle cx="390" cy="463" r="6" class="dot"/>
+  <text x="85" y="535" class="t">P3.2 / INT0  RPM</text><circle cx="390" cy="528" r="6" class="dot"/>
+  <text x="85" y="585" class="t">P3.3  START</text><circle cx="390" cy="578" r="6" class="dot"/>
+  <text x="85" y="635" class="t">P3.4  STOP healthy</text><circle cx="390" cy="628" r="6" class="dot"/>
+  <text x="85" y="685" class="t">P3.5  RESET</text><circle cx="390" cy="678" r="6" class="dot"/>
+  <text x="85" y="735" class="t">P3.6  FAULT</text><circle cx="390" cy="728" r="6" class="dot"/>
+  <text x="85" y="800" class="t">P3.1 / TXD  UART</text><circle cx="390" cy="793" r="6" class="dot"/>
+  <text x="85" y="855" class="t">GND</text><circle cx="390" cy="848" r="6" class="dot"/>
+
+  <rect x="505" y="130" width="355" height="140" rx="14" class="power"/>
+  <text x="682" y="170" text-anchor="middle" class="h">12 V / 2 A ADAPTER</text>
+  <text x="535" y="215" class="t">+12 V</text><circle cx="830" cy="208" r="6" class="dot"/>
+  <text x="535" y="250" class="t">0 V / GND</text><circle cx="830" cy="243" r="6" class="dot"/>
+
+  <rect x="940" y="130" width="210" height="80" rx="12" class="safe"/>
+  <text x="1045" y="165" text-anchor="middle" class="h">E-STOP NC</text>
+  <text x="1045" y="190" text-anchor="middle" class="s">hard-wired</text>
+  <rect x="1220" y="130" width="150" height="80" rx="12" class="safe"/>
+  <text x="1295" y="165" text-anchor="middle" class="h">2 A FUSE</text>
+  <text x="1295" y="190" text-anchor="middle" class="s">motor branch</text>
+  <rect x="1410" y="125" width="150" height="145" rx="12" class="power"/>
+  <text x="1485" y="165" text-anchor="middle" class="h">12 V MOTOR</text>
+  <text x="1485" y="193" text-anchor="middle" class="s">N20 geared</text>
+  <text x="1485" y="220" text-anchor="middle" class="s">1N5408 across M+/M-</text>
+  <text x="1485" y="244" text-anchor="middle" class="s">stripe to M+</text>
+
+  <path d="M830 208 H940" class="pwire" marker-end="url(#arrow)"/>
+  <path d="M1150 170 H1220" class="pwire" marker-end="url(#arrow)"/>
+  <path d="M1370 170 H1410" class="pwire" marker-end="url(#arrow)"/>
+
+  <rect x="1200" y="330" width="330" height="210" rx="16" class="box"/>
+  <text x="1365" y="370" text-anchor="middle" class="h">FR120N MOSFET MODULE</text>
+  <text x="1235" y="420" class="t">IN</text><circle cx="1215" cy="413" r="6" class="dot"/>
+  <text x="1235" y="465" class="t">Control GND</text><circle cx="1215" cy="458" r="6" class="dot"/>
+  <text x="1400" y="420" class="t">LOAD-</text><circle cx="1505" cy="413" r="6" class="dot"/>
+  <text x="1400" y="465" class="t">Power GND</text><circle cx="1505" cy="458" r="6" class="dot"/>
+  <text x="1365" y="510" text-anchor="middle" class="s">10 kohm from IN to GND</text>
+
+  <path d="M1485 270 V300 H1505 V413" class="wire" marker-end="url(#arrow)"/>
+  <path d="M390 263 H1120 V413 H1215" class="sig" marker-end="url(#bluearrow)"/>
+  <text x="785" y="250" class="s" fill="#235fa4">P1.0 HIGH = motor ON</text>
+
+  <rect x="535" y="330" width="300" height="105" rx="12" class="box"/>
+  <text x="685" y="370" text-anchor="middle" class="h">ACTIVE BUZZER</text>
+  <text x="685" y="402" text-anchor="middle" class="s">IN=P1.1, VCC=+5 V, GND</text>
+  <path d="M390 313 H535" class="sig" marker-end="url(#bluearrow)"/>
+
+  <rect x="535" y="470" width="300" height="150" rx="12" class="box"/>
+  <text x="685" y="507" text-anchor="middle" class="h">STATUS LEDs</text>
+  <text x="560" y="545" class="t">P1.2 -> 330 ohm -> Green -> GND</text>
+  <text x="560" y="575" class="t">P1.3 -> 330 ohm -> Yellow -> GND</text>
+  <text x="560" y="605" class="t">P1.4 -> 330 ohm -> Red -> GND</text>
+  <path d="M390 363 H470 V530 H535" class="sig" marker-end="url(#bluearrow)"/>
+  <path d="M390 413 H455 V565 H535" class="sig" marker-end="url(#bluearrow)"/>
+  <path d="M390 463 H440 V600 H535" class="sig" marker-end="url(#bluearrow)"/>
+
+  <rect x="900" y="600" width="270" height="125" rx="12" class="box"/>
+  <text x="1035" y="638" text-anchor="middle" class="h">TCRT5000 RPM</text>
+  <text x="930" y="675" class="t">DO -> P3.2 / INT0</text>
+  <text x="930" y="705" class="s">VCC=+5 V, GND common</text>
+  <path d="M390 528 H700 V662 H900" class="sig" marker-end="url(#bluearrow)"/>
+
+  <rect x="900" y="760" width="610" height="190" rx="14" class="box"/>
+  <text x="1205" y="800" text-anchor="middle" class="h">CONTROL BUTTONS TO COMMON GND</text>
+  <text x="930" y="840" class="t">START: P3.3 -- NO pushbutton -- GND</text>
+  <text x="930" y="875" class="t">STOP:  P3.4 -- NC pushbutton -- GND</text>
+  <text x="930" y="910" class="t">RESET: P3.5 -- NO pushbutton -- GND</text>
+  <text x="930" y="945" class="t">FAULT: P3.6 -- NO pushbutton -- GND</text>
+  <path d="M390 578 H620 V820 H900" class="sig"/>
+  <path d="M390 628 H605 V855 H900" class="sig"/>
+  <path d="M390 678 H590 V890 H900" class="sig"/>
+  <path d="M390 728 H575 V925 H900" class="sig"/>
+
+  <path d="M830 243 V1010 H1505 V458" class="gwire"/>
+  <path d="M390 848 V1010" class="gwire"/>
+  <path d="M1215 458 V1010" class="gwire"/>
+  <circle cx="830" cy="1010" r="7" class="dot"/><circle cx="1215" cy="1010" r="7" class="dot"/><circle cx="1505" cy="1010" r="7" class="dot"/>
+  <text x="800" y="1050" text-anchor="middle" class="h">COMMON GROUND: trainer GND = adapter negative = sensor GND = FR120N GND</text>
+
+  <rect x="505" y="970" width="270" height="55" rx="10" class="warn"/>
+  <text x="640" y="1005" text-anchor="middle" class="t">Never connect 12 V to the 8051 kit</text>
+
+  <rect x="55" y="955" width="360" height="70" rx="10" class="note"/>
+  <text x="235" y="983" text-anchor="middle" class="s">Use trainer's regulated +5 V logic supply.</text>
+  <text x="235" y="1008" text-anchor="middle" class="s">Connect grounds only; do not parallel 5 V supplies.</text>
+</svg>
