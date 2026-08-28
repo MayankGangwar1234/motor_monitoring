@@ -125,7 +125,9 @@ Some trainer kits already connect LEDs or a buzzer as active-LOW devices. Use ex
 
 A 300 dpi PNG version is also provided at `docs/8051_trainer_motor_circuit.png` for insertion into an experiment file.
 
-The complete printable lab sheet is available as [8051 Trainer DC Motor Experiment Guide](docs/8051_Trainer_DC_Motor_Experiment_Guide.pdf).
+The current printable lab manual is [8051 Trainer Experiments 1 and 2 - Full Sensors](docs/8051_Trainer_Experiments_1_and_2_Full_Sensors.pdf). It contains the basic motor-control experiment followed by the complete five-sensor experiment.
+
+The earlier single-experiment PDF is retained at [8051 Trainer DC Motor Experiment Guide](docs/8051_Trainer_DC_Motor_Experiment_Guide.pdf) for reference.
 
 ## Program behavior
 
@@ -216,13 +218,3 @@ Initial demonstration thresholds in the code are 1.2 A, 60.0 C and 2500 raw vibr
 4. Build and resolve any trainer-specific header name difference (`REG51.H` versus the kit vendor's MCU header).
 5. Test the level-shifted I2C bus and confirm addresses 0x40, 0x68 and 0x3C before connecting the motor.
 6. Verify DS18B20 timing on the actual trainer. Its One-Wire delays are written for an 11.0592 MHz classic 12-clock 8051.
-
-## Precautions
-
-- Keep the experiment low-voltage; never use mains wiring.
-- Verify STOP reads LOW before START.
-- Keep motor power OFF while rewiring.
-- Fix the motor and RPM disc firmly.
-- Never block the motor shaft to create a fault; use the FAULT button.
-- Verify common ground before enabling the motor.
-- If the FR120N input behavior differs, test it first with the motor disconnected.
