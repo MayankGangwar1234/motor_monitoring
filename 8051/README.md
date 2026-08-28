@@ -28,7 +28,12 @@ If your lab kit uses a different MCU, crystal, fixed active-low LEDs or shared p
 
 ## Learning scope
 
-The supplied `src/main.c` directly supports only the simple first-year circuit: buttons, RPM sensor, LEDs, buzzer, simulated fault and motor switching. The full INA219/MPU6050/OLED/DS18B20 expansion is mapped later in this document, but it requires separate sensor-driver experiments.
+Two experiments are supplied:
+
+1. `src/main.c`: simple first-year motor control, buttons, RPM, LEDs and buzzer.
+2. `src/full_sensor_experiment.c`: complete sensor integration using INA219, MPU6050, DS18B20, TCRT5000 and SSD1306 OLED.
+
+Create separate Keil targets/projects for the two source files. Do not add both files to the same target because both define `main()` and the same hardware pins.
 
 ## Required components
 
@@ -153,9 +158,18 @@ The complete printable lab sheet is available as [8051 Trainer DC Motor Experime
 | RESET after restoring inputs | OFF | Yellow ON | Clear |
 | START after RESET | ON | Green ON | Clear |
 
-## Full sensor expansion on the 8051
+## Experiment 2: Full sensor monitoring on the 8051
 
-The current project's sensors can also be electrically connected to the 8051, but their driver code is intentionally outside the first experiment.
+Experiment 2 adds the rest of the project sensors to the same low-voltage motor circuit. Its complete Keil C51 source is [`src/full_sensor_experiment.c`](src/full_sensor_experiment.c).
+
+### Additional mandatory interface parts
+
+| Component | Quantity | Reason |
+|---|---:|---|
+| Regulated 3.3 V module | 1 | Powers INA219, MPU6050, OLED and the low-voltage side of the level shifter |
+| BSS138 four-channel bidirectional level-shifter module | 1 | Safely translates the 8051's 5 V I2C bus to 3.3 V |
+
+Do not assume that every breakout board is 5 V safe. The Experiment 2 wiring deliberately powers the I2C modules from a verified 3.3 V rail.
 
 | Device | 8051 connection | Supply | Mandatory interface note |
 |---|---|---|---|
@@ -175,6 +189,33 @@ Common GND ---------------------- sensor GND
 ```
 
 Do not connect a 5 V I2C pull-up directly to INA219, MPU6050 or SSD1306 logic pins. The 8051 version also has no Wi-Fi/MQTT dashboard unless an additional communication module is added.
+
+### Complete Experiment 2 circuit
+
+![Complete 8051 full-sensor circuit](docs/8051_full_sensor_circuit.svg)
+
+A high-resolution PNG is available at `docs/8051_full_sensor_circuit.png`.
+
+### Experiment 2 software behavior
+
+- INA219 is sampled every 100 ms for motor-bus voltage and current.
+- MPU6050 is sampled every 50 ms. A simple sample-to-sample acceleration-change index is used for the teaching experiment; it is not an FFT.
+- DS18B20 temperature is updated approximately once per second.
+- TCRT5000 pulses are counted by INT0 and converted to RPM once per second.
+- SSD1306 displays temperature, current, voltage, RPM, vibration index and RUN/READY/TRIP state.
+- STOP, sensor failure, overcurrent, overtemperature, abnormal vibration or the FAULT button switches the motor OFF and latches the trip.
+- RESET is accepted only after inputs and sensor values are safe. RESET never starts the motor.
+
+Initial demonstration thresholds in the code are 1.2 A, 60.0 C and 2500 raw vibration-change counts. These are provisional teaching values and must be tuned from measured healthy readings.
+
+### Build Experiment 2
+
+1. Create a second Keil project/target for the same AT89S52 trainer.
+2. Add only `src/full_sensor_experiment.c`.
+3. Set the crystal to 11.0592 MHz and enable HEX generation.
+4. Build and resolve any trainer-specific header name difference (`REG51.H` versus the kit vendor's MCU header).
+5. Test the level-shifted I2C bus and confirm addresses 0x40, 0x68 and 0x3C before connecting the motor.
+6. Verify DS18B20 timing on the actual trainer. Its One-Wire delays are written for an 11.0592 MHz classic 12-clock 8051.
 
 ## Precautions
 

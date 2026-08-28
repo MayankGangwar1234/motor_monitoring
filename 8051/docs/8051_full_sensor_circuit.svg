@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1200" viewBox="0 0 1800 1200">
+  <defs>
+    <style>
+      .title{font:700 38px Arial;fill:#10233f}.sub{font:17px Arial;fill:#52627a}.h{font:700 23px Arial;fill:#10233f}.t{font:18px Arial;fill:#172033}.s{font:15px Arial;fill:#46556b}.box{fill:#f8fbff;stroke:#315b8a;stroke-width:3}.logic{fill:#edf7ff;stroke:#2365a1;stroke-width:3}.sensor{fill:#eef9ef;stroke:#2b7a3d;stroke-width:3}.power{fill:#fff6e5;stroke:#b56b00;stroke-width:3}.protect{fill:#fff0f0;stroke:#a62d2d;stroke-width:3}.wire{fill:none;stroke:#243247;stroke-width:4}.blue{fill:none;stroke:#235fa4;stroke-width:4}.red{fill:none;stroke:#c5392f;stroke-width:5}.green{fill:none;stroke:#2b7a3d;stroke-width:4}.ground{fill:none;stroke:#111;stroke-width:5}.dash{fill:none;stroke:#69778a;stroke-width:3;stroke-dasharray:10 8}.dot{fill:#243247}
+    </style>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#243247"/></marker>
+    <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#235fa4"/></marker>
+    <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2b7a3d"/></marker>
+  </defs>
+  <rect width="1800" height="1200" fill="white"/>
+  <text x="900" y="55" text-anchor="middle" class="title">Experiment 2 - Complete 8051 Sensor and Motor Interfacing</text>
+  <text x="900" y="88" text-anchor="middle" class="sub">INA219 + MPU6050 + SSD1306 + DS18B20 + TCRT5000 | 5 V trainer logic | protected 3.3 V sensor bus</text>
+
+  <rect x="55" y="145" width="390" height="720" rx="18" class="box"/>
+  <text x="250" y="190" text-anchor="middle" class="h">8051 TRAINER - AT89S52</text>
+  <text x="250" y="220" text-anchor="middle" class="s">+5 V logic, 11.0592 MHz</text>
+  <text x="85" y="285" class="t">P2.0 - I2C SDA</text><circle cx="420" cy="278" r="6" class="dot"/>
+  <text x="85" y="335" class="t">P2.1 - I2C SCL</text><circle cx="420" cy="328" r="6" class="dot"/>
+  <text x="85" y="405" class="t">P1.5 - DS18B20 DATA</text><circle cx="420" cy="398" r="6" class="dot"/>
+  <text x="85" y="475" class="t">P3.2 / INT0 - RPM</text><circle cx="420" cy="468" r="6" class="dot"/>
+  <text x="85" y="545" class="t">P1.0 - FR120N IN</text><circle cx="420" cy="538" r="6" class="dot"/>
+  <text x="85" y="615" class="t">P1.1-P1.4 - buzzer/LEDs</text><circle cx="420" cy="608" r="6" class="dot"/>
+  <text x="85" y="685" class="t">P3.3-P3.6 - buttons</text><circle cx="420" cy="678" r="6" class="dot"/>
+  <text x="85" y="755" class="t">P3.1 / TXD - UART</text><circle cx="420" cy="748" r="6" class="dot"/>
+  <text x="85" y="825" class="t">GND</text><circle cx="420" cy="818" r="6" class="dot"/>
+
+  <rect x="520" y="135" width="300" height="120" rx="14" class="power"/>
+  <text x="670" y="178" text-anchor="middle" class="h">TRAINER +5 V</text>
+  <text x="670" y="210" text-anchor="middle" class="s">TCRT5000, DS18B20, HV side</text>
+  <rect x="900" y="135" width="310" height="120" rx="14" class="power"/>
+  <text x="1055" y="178" text-anchor="middle" class="h">3.3 V REGULATOR</text>
+  <text x="1055" y="210" text-anchor="middle" class="s">AMS1117-3.3 module or equivalent</text>
+  <path d="M820 195H900" class="red" marker-end="url(#a)"/>
+  <text x="860" y="180" text-anchor="middle" class="s">+5 V</text>
+
+  <rect x="540" y="300" width="300" height="230" rx="16" class="logic"/>
+  <text x="690" y="345" text-anchor="middle" class="h">BSS138 I2C LEVEL SHIFTER</text>
+  <text x="575" y="395" class="t">HV = +5 V</text>
+  <text x="575" y="435" class="t">HV1 = P2.0 SDA</text>
+  <text x="575" y="475" class="t">HV2 = P2.1 SCL</text>
+  <text x="715" y="395" class="t">LV = +3.3 V</text>
+  <text x="720" y="435" class="t">LV1 = SDA bus</text>
+  <text x="720" y="475" class="t">LV2 = SCL bus</text>
+  <path d="M420 278H490V435H540" class="blue" marker-end="url(#ab)"/>
+  <path d="M420 328H475V475H540" class="blue" marker-end="url(#ab)"/>
+  <path d="M670 255V300" class="red" marker-end="url(#a)"/>
+  <path d="M1055 255V280H840V395" class="green" marker-end="url(#ag)"/>
+
+  <rect x="930" y="315" width="250" height="125" rx="14" class="sensor"/>
+  <text x="1055" y="355" text-anchor="middle" class="h">INA219</text>
+  <text x="1055" y="388" text-anchor="middle" class="t">SDA/SCL, address 0x40</text>
+  <text x="1055" y="417" text-anchor="middle" class="s">VCC = 3.3 V</text>
+  <rect x="1240" y="315" width="250" height="125" rx="14" class="sensor"/>
+  <text x="1365" y="355" text-anchor="middle" class="h">MPU6050</text>
+  <text x="1365" y="388" text-anchor="middle" class="t">SDA/SCL, address 0x68</text>
+  <text x="1365" y="417" text-anchor="middle" class="s">VCC = 3.3 V</text>
+  <rect x="930" y="485" width="250" height="125" rx="14" class="sensor"/>
+  <text x="1055" y="525" text-anchor="middle" class="h">SSD1306 OLED</text>
+  <text x="1055" y="558" text-anchor="middle" class="t">SDA/SCL, address 0x3C</text>
+  <text x="1055" y="587" text-anchor="middle" class="s">VCC = 3.3 V</text>
+  <path d="M840 435H885V375H930" class="green" marker-end="url(#ag)"/>
+  <path d="M885 375H1240" class="green" marker-end="url(#ag)"/>
+  <path d="M885 375V545H930" class="green" marker-end="url(#ag)"/>
+  <text x="900" y="360" text-anchor="middle" class="s">3.3 V I2C SDA/SCL bus</text>
+
+  <rect x="540" y="590" width="300" height="120" rx="14" class="sensor"/>
+  <text x="690" y="630" text-anchor="middle" class="h">DS18B20</text>
+  <text x="690" y="665" text-anchor="middle" class="t">DATA to P1.5</text>
+  <text x="690" y="694" text-anchor="middle" class="s">4.7 kohm DATA to +5 V</text>
+  <path d="M420 398H500V650H540" class="blue" marker-end="url(#ab)"/>
+  <rect x="540" y="750" width="300" height="120" rx="14" class="sensor"/>
+  <text x="690" y="790" text-anchor="middle" class="h">TCRT5000 RPM</text>
+  <text x="690" y="825" text-anchor="middle" class="t">DO to P3.2 / INT0</text>
+  <text x="690" y="854" text-anchor="middle" class="s">VCC = +5 V, one mark/rev</text>
+  <path d="M420 468H485V810H540" class="blue" marker-end="url(#ab)"/>
+
+  <rect x="930" y="660" width="560" height="210" rx="16" class="logic"/>
+  <text x="1210" y="705" text-anchor="middle" class="h">CONTROL AND LOCAL OUTPUTS - SAME AS EXPERIMENT 1</text>
+  <text x="970" y="750" class="t">P1.0 -> FR120N IN with 10 kohm pull-down</text>
+  <text x="970" y="790" class="t">P1.1 -> active buzzer; P1.2/P1.3/P1.4 -> LEDs through 330 ohm</text>
+  <text x="970" y="830" class="t">P3.3 START NO; P3.4 STOP NC; P3.5 RESET NO; P3.6 FAULT NO</text>
+  <path d="M445 700H490V895H900V790H930" class="dash" marker-end="url(#a)"/>
+  <text x="700" y="890" text-anchor="middle" class="s">retain all Experiment 1 control wiring</text>
+
+  <rect x="70" y="925" width="220" height="95" rx="12" class="power"/>
+  <text x="180" y="965" text-anchor="middle" class="h">12 V / 2 A</text>
+  <text x="180" y="997" text-anchor="middle" class="s">isolated adapter</text>
+  <rect x="350" y="925" width="190" height="95" rx="12" class="protect"/>
+  <text x="445" y="965" text-anchor="middle" class="h">E-STOP NC</text>
+  <text x="445" y="997" text-anchor="middle" class="s">hard-wired</text>
+  <rect x="600" y="925" width="150" height="95" rx="12" class="protect"/>
+  <text x="675" y="965" text-anchor="middle" class="h">2 A FUSE</text>
+  <rect x="810" y="910" width="250" height="125" rx="12" class="sensor"/>
+  <text x="935" y="950" text-anchor="middle" class="h">INA219 POWER PATH</text>
+  <text x="935" y="983" text-anchor="middle" class="t">VIN+ -> VIN-</text>
+  <text x="935" y="1012" text-anchor="middle" class="s">logic remains on 3.3 V bus</text>
+  <rect x="1120" y="925" width="200" height="95" rx="12" class="power"/>
+  <text x="1220" y="965" text-anchor="middle" class="h">12 V MOTOR</text>
+  <text x="1220" y="997" text-anchor="middle" class="s">1N5408 across M+/M-</text>
+  <rect x="1380" y="925" width="260" height="95" rx="12" class="logic"/>
+  <text x="1510" y="965" text-anchor="middle" class="h">FR120N LOW-SIDE</text>
+  <text x="1510" y="997" text-anchor="middle" class="s">motor - -> LOAD- -> GND</text>
+  <path d="M290 972H350" class="red" marker-end="url(#a)"/>
+  <path d="M540 972H600" class="red" marker-end="url(#a)"/>
+  <path d="M750 972H810" class="red" marker-end="url(#a)"/>
+  <path d="M1060 972H1120" class="red" marker-end="url(#a)"/>
+  <path d="M1320 972H1380" class="wire" marker-end="url(#a)"/>
+
+  <path d="M70 1090H1660" class="ground"/>
+  <path d="M420 818V1090" class="ground"/>
+  <path d="M1510 1020V1090" class="ground"/>
+  <path d="M670 870V1090" class="ground"/>
+  <path d="M1055 610V1090" class="ground"/>
+  <circle cx="420" cy="1090" r="7" class="dot"/><circle cx="670" cy="1090" r="7" class="dot"/><circle cx="1055" cy="1090" r="7" class="dot"/><circle cx="1510" cy="1090" r="7" class="dot"/>
+  <text x="865" y="1133" text-anchor="middle" class="h">COMMON GROUND: 8051 GND = 3.3 V regulator GND = all sensor GND = 12 V adapter negative</text>
+  <rect x="1190" y="135" width="500" height="120" rx="14" class="protect"/>
+  <text x="1440" y="175" text-anchor="middle" class="h">DO NOT CONNECT 5 V I2C DIRECTLY</text>
+  <text x="1440" y="208" text-anchor="middle" class="t">Use the level shifter and verified 3.3 V rail.</text>
+  <text x="1440" y="235" text-anchor="middle" class="s">Never connect 12 V to the trainer or sensor logic pins.</text>
+</svg>
