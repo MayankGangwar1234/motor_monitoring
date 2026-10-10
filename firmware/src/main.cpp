@@ -1,3 +1,4 @@
+
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <DallasTemperature.h>
@@ -447,6 +448,7 @@ void sampleVibrationBlock() {
     vibrationRmsG = NAN;
     Serial.println("[sensor] vibration block invalid");
   }
+
 }
 
 // ------------------------------------------------------------
